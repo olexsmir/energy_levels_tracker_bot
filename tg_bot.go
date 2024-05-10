@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"strconv"
+	"unicode"
 
 	"github.com/mymmrac/telego"
 	"github.com/mymmrac/telego/telegoutil"
@@ -57,6 +59,12 @@ func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 		if update.Message != nil {
 			chatID := telegoutil.ID(update.Message.Chat.ID)
 
+			if err := validateMsg(update.Message.Text); err != nil {
+				b.bot.SendMessage(telegoutil.Message(chatID, err.Error()))
+				slog.Error("message is not valid", "err", err)
+				return
+			}
+
 			if err := b.db.Insert(update.Message.Text); err != nil {
 				b.bot.SendMessage(telegoutil.Message(chatID, "failed to save your message"))
 				slog.Error("failed to save", "err", err)
@@ -72,4 +80,21 @@ func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 			})
 		}
 	}
+}
+
+func validateMsg(inp string) error {
+	if !unicode.IsDigit(rune(inp[0])) {
+		return fmt.Errorf("the message must start with the rateing")
+	}
+
+	i, err := strconv.Atoi(inp)
+	if err != nil {
+		return err
+	}
+
+	if i < 0 || i > 5 {
+		return fmt.Errorf("the rating must be between 0 and 5")
+	}
+
+	return nil
 }
