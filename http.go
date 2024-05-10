@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"net/http"
 	"strconv"
 )
@@ -21,6 +22,7 @@ func NewHTTPServer(port string, db *DB) *HTTPServer {
 func (h *HTTPServer) Start() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /__outload", h.outloadHandler)
+	mux.HandleFunc("GET /health", h.healthHandler)
 
 	http.ListenAndServe(":"+h.port, mux)
 }
@@ -43,6 +45,17 @@ func (h *HTTPServer) outloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cw.Flush()
+}
+
+func (h *HTTPServer) healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := json.NewEncoder(w).Encode(map[string]string{
+		"message": "ok",
+	}); err != nil {
+		httpError(w, err)
+	}
 }
 
 func httpError(w http.ResponseWriter, err error) {
