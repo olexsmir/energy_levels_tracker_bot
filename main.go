@@ -22,7 +22,7 @@ func main() {
 	httpserver := NewHTTPServer(cfg.HttpPort, db)
 
 	// scheduler.Add("@every 1s")
-	scheduler.Add("0 * * * * *")
+	scheduler.Add("0 * * * *")
 
 	go bot.Start()
 	go scheduler.Start()
