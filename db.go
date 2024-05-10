@@ -42,10 +42,9 @@ func (d *DB) GetAll() ([]EnergyLevel, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var res []EnergyLevel
-
-	defer rows.Close()
 	for rows.Next() {
 		var el EnergyLevel
 		if err := rows.Scan(&el.ID, &el.Value, &el.CreatedAt); err != nil {
