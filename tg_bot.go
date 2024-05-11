@@ -56,7 +56,7 @@ func (b *TGBot) Asker() {
 
 func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 	for update := range updates {
-		if update.Message != nil {
+		if update.Message != nil && update.Message.Chat.ID == b.adminID.ID {
 			chatID := telegoutil.ID(update.Message.Chat.ID)
 
 			if err := validateMsg(update.Message.Text); err != nil {

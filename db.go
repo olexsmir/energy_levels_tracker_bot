@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"log/slog"
 	"time"
 
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
@@ -33,6 +34,7 @@ func NewDB(dbstr string) (*DB, error) {
 }
 
 func (d *DB) Insert(val string) error {
+	slog.Debug("writting value", "val", val)
 	_, err := d.db.Exec("INSERT INTO levels (value) VALUES (?)", val)
 	return err
 }
@@ -54,8 +56,4 @@ func (d *DB) GetAll() ([]EnergyLevel, error) {
 	}
 
 	return res, rows.Err()
-}
-
-func (d *DB) Stop() error {
-	return d.db.Close()
 }
