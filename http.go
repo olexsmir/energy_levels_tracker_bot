@@ -45,7 +45,7 @@ func (h *HTTPServer) outloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cw := csv.NewWriter(w)
-	cw.Write([]string{"ID", "Value", "CreatedAt"})
+	cw.Write([]string{"id", "value", "created_at"})
 	for _, row := range data {
 		id := strconv.Itoa(row.ID)
 		cw.Write([]string{id, row.Value, row.CreatedAt.String()})
