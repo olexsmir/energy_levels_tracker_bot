@@ -87,7 +87,7 @@ func validateMsg(inp string) error {
 		return fmt.Errorf("the message must start with the rateing")
 	}
 
-	i, err := strconv.Atoi(inp)
+	i, err := strconv.Atoi(string(inp[0]))
 	if err != nil {
 		return err
 	}
