@@ -21,7 +21,7 @@ func main() {
 	scheduler := NewScheduler(bot.Asker)
 	httpserver := NewHTTPServer(cfg.HttpPort, db)
 
-	scheduler.Add("@every 5s")
+	// scheduler.Add("@every 5s")
 	scheduler.Add("@every 1h")
 
 	go func() {
