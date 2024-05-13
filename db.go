@@ -16,9 +16,10 @@ type EnergyLevel struct {
 
 type DB struct {
 	db *sql.DB
+	tz int
 }
 
-func NewDB(dbstr string) (*DB, error) {
+func NewDB(dbstr string, tz int) (*DB, error) {
 	sdb, err := sql.Open("libsql", dbstr)
 	if err != nil {
 		return nil, err
@@ -30,6 +31,7 @@ func NewDB(dbstr string) (*DB, error) {
 
 	return &DB{
 		db: sdb,
+		tz: tz,
 	}, nil
 }
 
@@ -52,6 +54,7 @@ func (d *DB) GetAll() ([]EnergyLevel, error) {
 		if err := rows.Scan(&el.ID, &el.Value, &el.CreatedAt); err != nil {
 			return nil, err
 		}
+		el.CreatedAt = el.CreatedAt.Add(time.Duration(d.tz) * time.Hour)
 		res = append(res, el)
 	}
 

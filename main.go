@@ -12,7 +12,7 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
-	db, err := NewDB(cfg.DBConn)
+	db, err := NewDB(cfg.DBConn, cfg.TimeZone)
 	if err != nil {
 		slog.Error("failed to connect to the database", "error", err)
 	}
