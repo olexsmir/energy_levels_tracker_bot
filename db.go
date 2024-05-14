@@ -9,9 +9,9 @@ import (
 )
 
 type EnergyLevel struct {
-	ID        int
-	Value     string
-	CreatedAt time.Time
+	ID        int       `json:"id"`
+	Value     string    `json:"value"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type DB struct {
