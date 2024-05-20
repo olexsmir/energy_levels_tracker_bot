@@ -60,29 +60,34 @@ func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 			chatID := telegoutil.ID(update.Message.Chat.ID)
 
 			if err := validateMsg(update.Message.Text); err != nil {
-				b.bot.SendMessage(telegoutil.Message(chatID, err.Error()))
+				_, _ = b.bot.SendMessage(telegoutil.Message(chatID, err.Error()))
 				slog.Error("message is not valid", "err", err)
 				return
 			}
 
 			if err := b.db.Insert(update.Message.Text); err != nil {
-				b.bot.SendMessage(telegoutil.Message(chatID, "failed to save your message"))
+				_, _ = b.bot.SendMessage(telegoutil.Message(chatID, "failed to save your message"))
 				slog.Error("failed to save", "err", err)
 				return
 			}
 
-			b.bot.SetMessageReaction(&telego.SetMessageReactionParams{
+			if err := b.bot.SetMessageReaction(&telego.SetMessageReactionParams{
 				ChatID:    chatID,
 				MessageID: update.Message.MessageID,
 				Reaction: []telego.ReactionType{
 					&telego.ReactionTypeEmoji{Type: "emoji", Emoji: "👍"},
 				},
-			})
+			}); err != nil {
+				slog.Error("failed to react to user mesage")
+				return
+			}
 		}
 	}
 }
 
 func validateMsg(inp string) error {
+	slog.Debug("input message", "inp", inp)
+
 	if !unicode.IsDigit(rune(inp[0])) {
 		return fmt.Errorf("the message must start with the rateing")
 	}
