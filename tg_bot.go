@@ -57,6 +57,7 @@ func (b *TGBot) Asker() {
 
 func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 	for update := range updates {
+		slog.Debug("new message", "user_id", update.Message.From.ID, "message", update.Message.Text)
 		if update.Message != nil && update.Message.Chat.ID == b.adminID.ID {
 			chatID := telegoutil.ID(update.Message.Chat.ID)
 
