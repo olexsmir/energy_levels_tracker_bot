@@ -11,15 +11,15 @@ import (
 type EnergyLevel struct {
 	ID        int       `json:"id"`
 	Value     string    `json:"value"`
+	Hour      int       `json:"hour"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type DB struct {
 	db *sql.DB
-	tz int
 }
 
-func NewDB(dbstr string, tz int) (*DB, error) {
+func NewDB(dbstr string) (*DB, error) {
 	sdb, err := sql.Open("libsql", dbstr)
 	if err != nil {
 		return nil, err
@@ -29,20 +29,22 @@ func NewDB(dbstr string, tz int) (*DB, error) {
 		return nil, err
 	}
 
-	return &DB{
-		db: sdb,
-		tz: tz,
-	}, nil
+	return &DB{db: sdb}, nil
 }
 
-func (d *DB) Insert(val string) error {
-	slog.Debug("writting value", "val", val)
-	_, err := d.db.Exec("INSERT INTO levels (value) VALUES (?)", val)
+func (d *DB) Insert(val string, hour int, createdAt time.Time) error {
+	slog.Debug("writing value", "val", val)
+	_, err := d.db.Exec(
+		"INSERT INTO levels (value, hour, created_at) VALUES (?, ?, ?)",
+		val,
+		hour,
+		createdAt,
+	)
 	return err
 }
 
 func (d *DB) GetAll() ([]EnergyLevel, error) {
-	rows, err := d.db.Query("SELECT id, value, created_at FROM levels")
+	rows, err := d.db.Query("SELECT id, value, hour, created_at FROM levels")
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +56,6 @@ func (d *DB) GetAll() ([]EnergyLevel, error) {
 		if err := rows.Scan(&el.ID, &el.Value, &el.CreatedAt); err != nil {
 			return nil, err
 		}
-		el.CreatedAt = el.CreatedAt.Add(time.Duration(d.tz) * time.Hour)
 		res = append(res, el)
 	}
 

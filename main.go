@@ -2,9 +2,12 @@ package main
 
 import (
 	"log/slog"
+	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 )
+
+var location *time.Location
 
 func main() {
 	cfg := NewConfig()
@@ -12,7 +15,13 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
-	db, err := NewDB(cfg.DBConn, cfg.TimeZone)
+	var err error
+	location, err = time.LoadLocation(cfg.TimeZone)
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := NewDB(cfg.DBConn)
 	if err != nil {
 		slog.Error("failed to connect to the database", "error", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"time"
 	"unicode"
 
 	"github.com/mymmrac/telego"
@@ -65,7 +66,8 @@ func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 				return
 			}
 
-			if err := b.db.Insert(update.Message.Text); err != nil {
+			t := time.Now().In(location)
+			if err := b.db.Insert(update.Message.Text, t.Hour(), t); err != nil {
 				_, _ = b.bot.SendMessage(telegoutil.Message(chatID, "failed to save your message"))
 				slog.Error("failed to save", "err", err)
 				return
@@ -78,7 +80,7 @@ func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 					&telego.ReactionTypeEmoji{Type: "emoji", Emoji: "👍"},
 				},
 			}); err != nil {
-				slog.Error("failed to react to user mesage")
+				slog.Error("failed to react to user message")
 				return
 			}
 		}

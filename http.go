@@ -72,7 +72,7 @@ func (h *HTTPServer) outloadHandler(w http.ResponseWriter, r *http.Request) {
 	for _, row := range data {
 		id := strconv.Itoa(row.ID)
 		cw.Write([]string{id, row.Value, row.CreatedAt.String()})
-		slog.Debug("writting row", "row", row)
+		slog.Debug("writing row", "row", row)
 	}
 
 	cw.Flush()
