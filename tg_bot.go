@@ -68,12 +68,14 @@ func (b *TGBot) handleMessages(updates <-chan telego.Update) {
 			}
 
 			t := time.Now().In(location)
+			slog.Debug("handler: saving", "t", t, "chatID", chatID, "msg", update.Message.Text)
 			if err := b.db.Insert(update.Message.Text, t.Hour(), t); err != nil {
 				_, _ = b.bot.SendMessage(telegoutil.Message(chatID, "failed to save your message"))
 				slog.Error("failed to save", "err", err)
 				return
 			}
 
+			slog.Debug("message saved")
 			if err := b.bot.SetMessageReaction(&telego.SetMessageReactionParams{
 				ChatID:    chatID,
 				MessageID: update.Message.MessageID,
